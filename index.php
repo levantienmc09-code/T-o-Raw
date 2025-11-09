@@ -105,7 +105,7 @@ $edit_content = $edit && file_exists($DATA_DIR.'/'.$user.'_'.$edit) ? file_get_c
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini IDE - Đăng nhập / Đăng ký</title>
+<title> Tạo Raw Nhanh </title>
 <style>
 body{font-family:Arial,sans-serif;background:#0b1220;color:#eee;text-align:center;padding-top:60px;}
 h1{margin-bottom:40px;font-size:36px;}
@@ -118,7 +118,7 @@ p.success{color:#4ade80;}
 </style>
 </head>
 <body>
-<h1>Mini IDE</h1>
+<h1>Tạo Raw Nhanh</h1>
 <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
 <?php if(isset($success)) echo "<p class='success'>$success</p>"; ?>
 <button onclick="document.getElementById('login').style.display='block';document.getElementById('register').style.display='none'">Đăng nhập</button>
@@ -148,7 +148,7 @@ Mật khẩu:<br><input type="password" name="password" placeholder="Mật khẩ
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini IDE - <?=$user?></title>
+<title>Tạo Raw Nhanh- <?=$user?></title>
 <style>
 body{font-family:Arial,sans-serif;background:#0b1220;color:#eee;margin:0;padding:20px;}
 h2{display:flex;justify-content:space-between;align-items:center;}
@@ -169,7 +169,7 @@ a:hover{color:#60a5fa;}
 </style>
 </head>
 <body>
-<h2>Mini IDE - <?=$user?> <a class="logout" href="?logout">Đăng xuất</a></h2>
+<h2>Tạo Raw - <?=$user?> <a class="logout" href="?logout">Đăng xuất</a></h2>
 
 <?php if($edit): ?>
 <div class="card">
