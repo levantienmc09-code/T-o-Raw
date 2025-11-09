@@ -3,8 +3,10 @@ ob_start();
 session_start();
 
 // --- Config ---
-$USERS_FILE = __DIR__.'/users.json'; // lưu acc ngay cùng index.php
+$DATA_DIR = __DIR__.'/data';
+if(!is_dir($DATA_DIR)) mkdir($DATA_DIR,0755,true);
 
+$USERS_FILE = $DATA_DIR.'/users.json';
 if(!file_exists($USERS_FILE)) file_put_contents($USERS_FILE,'{}');
 $users = json_decode(file_get_contents($USERS_FILE), true);
 
@@ -61,7 +63,7 @@ $user = $_SESSION['user'] ?? null;
 // --- Handle Save file ---
 if($user && $_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['file']) && isset($_POST['code'])){
     $f = preg_replace('/[^a-zA-Z0-9_\-\.]/','',$_POST['file']);
-    $path = __DIR__.'/'.$user.'_'.$f;
+    $path = $DATA_DIR.'/'.$user.'_'.$f;
     file_put_contents($path, $_POST['code']);
     header("Location: ".$_SERVER['PHP_SELF']."?edit=$f"); exit;
 }
@@ -69,7 +71,7 @@ if($user && $_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['file']) && isse
 // --- Serve raw ---
 if(isset($_GET['raw']) && $user){
     $f = preg_replace('/[^a-zA-Z0-9_\-\.]/','',$_GET['raw']);
-    $path = __DIR__.'/'.$user.'_'.$f;
+    $path = $DATA_DIR.'/'.$user.'_'.$f;
     if(!file_exists($path)){ http_response_code(404); echo "Không tìm thấy file"; exit; }
     header('Content-Type: text/plain; charset=utf-8');
     readfile($path); exit;
@@ -78,7 +80,7 @@ if(isset($_GET['raw']) && $user){
 // --- Delete file ---
 if(isset($_GET['del']) && $user){
     $f = preg_replace('/[^a-zA-Z0-9_\-\.]/','',$_GET['del']);
-    $path = __DIR__.'/'.$user.'_'.$f;
+    $path = $DATA_DIR.'/'.$user.'_'.$f;
     if(file_exists($path)) unlink($path);
     header("Location: ".$_SERVER['PHP_SELF']); exit;
 }
@@ -86,15 +88,15 @@ if(isset($_GET['del']) && $user){
 // --- List files ---
 $files = [];
 if($user){
-    foreach(scandir(__DIR__) as $f){
-        if(is_file(__DIR__.'/'.$f) && strpos($f, $user.'_')===0){
+    foreach(scandir($DATA_DIR) as $f){
+        if(is_file($DATA_DIR.'/'.$f) && strpos($f, $user.'_')===0){
             $files[] = substr($f, strlen($user)+1);
         }
     }
 }
 $edit = $_GET['edit'] ?? '';
 $edit = preg_replace('/[^a-zA-Z0-9_\-\.]/','',$edit);
-$edit_content = $edit && file_exists(__DIR__.'/'.$user.'_'.$edit) ? file_get_contents(__DIR__.'/'.$user.'_'.$edit) : '';
+$edit_content = $edit && file_exists($DATA_DIR.'/'.$user.'_'.$edit) ? file_get_contents($DATA_DIR.'/'.$user.'_'.$edit) : '';
 ?>
 
 <?php if(!$user): ?>
@@ -103,7 +105,7 @@ $edit_content = $edit && file_exists(__DIR__.'/'.$user.'_'.$edit) ? file_get_con
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raw Nhanh</title>
+<title>Mini IDE - Đăng nhập / Đăng ký</title>
 <style>
 body{font-family:Arial,sans-serif;background:#0b1220;color:#eee;text-align:center;padding-top:60px;}
 h1{margin-bottom:40px;font-size:36px;}
@@ -116,7 +118,7 @@ p.success{color:#4ade80;}
 </style>
 </head>
 <body>
-<h1>j</h1>
+<h1>Mini IDE</h1>
 <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
 <?php if(isset($success)) echo "<p class='success'>$success</p>"; ?>
 <button onclick="document.getElementById('login').style.display='block';document.getElementById('register').style.display='none'">Đăng nhập</button>
@@ -146,7 +148,7 @@ Mật khẩu:<br><input type="password" name="password" placeholder="Mật khẩ
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tạo Raw - <?=$user?></title>
+<title>Mini IDE - <?=$user?></title>
 <style>
 body{font-family:Arial,sans-serif;background:#0b1220;color:#eee;margin:0;padding:20px;}
 h2{display:flex;justify-content:space-between;align-items:center;}
@@ -167,7 +169,7 @@ a:hover{color:#60a5fa;}
 </style>
 </head>
 <body>
-<h2>Tạo Raw - <?=$user?> <a class="logout" href="?logout">Đăng xuất</a></h2>
+<h2>Mini IDE - <?=$user?> <a class="logout" href="?logout">Đăng xuất</a></h2>
 
 <?php if($edit): ?>
 <div class="card">
@@ -197,7 +199,7 @@ a:hover{color:#60a5fa;}
 <?php foreach($files as $f): ?>
 <tr>
 <td><?=$f?></td>
-<td><?php if(filesize(__DIR__.'/'.$user.'_'.$f)>0){ ?><a href="?raw=<?=urlencode($f)?>" target="_blank">RAW</a><?php } ?></td>
+<td><?php if(filesize($DATA_DIR.'/'.$user.'_'.$f)>0){ ?><a href="?raw=<?=urlencode($f)?>" target="_blank">RAW</a><?php } ?></td>
 <td><a href="?edit=<?=urlencode($f)?>">CHỈNH SỬA</a></td>
 <td><a href="?del=<?=urlencode($f)?>" onclick="return confirm('Bạn có chắc muốn xóa file này?')">XÓA</a></td>
 </tr>
